@@ -8,7 +8,6 @@
     <style>
         body, html { margin:0; padding:0; height:100%; font-family:Arial, sans-serif; }
         #map { height:100%; }
-        /* Responsive centering for program viewer and button */
         #program-viewer, #open-program {
             left: 50%;
             transform: translateX(-50%);
@@ -32,6 +31,8 @@
         #open-program {
             position: absolute;
             top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             width: auto;
             background: rgba(45,64,89,0.97);
             color: #FFD460;
@@ -47,14 +48,18 @@
         @media (max-width: 600px) {
             #program-viewer {
                 top: 60px;
-                width: 98vw;
-                max-width: 98vw;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 92vw;
+                max-width: 370px;
                 padding: 12px 4vw 12px 4vw;
             }
             #open-program {
-                top: 20px;
+                top: 16px;
+                left: 50%;
+                transform: translateX(-50%);
                 width: 80vw;
-                max-width: 98vw;
+                max-width: 320px;
                 padding: 8px 0;
             }
         }
