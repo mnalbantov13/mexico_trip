@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mexico Adventure Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body, html { margin:0; padding:0; height:100%; font-family:Arial, sans-serif; }
+        #map { height:100%; }
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            max-width: 300px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .info-panel h2 {
+            margin:0 0 10px 0;
+            font-size: 22px;
+            color: #E67E22;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<div class="info-panel">
+    <h2>Mexico Adventure</h2>
+    <p>Follow the numbered route with fun emojis to see each destination's theme.</p>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+// Initialize the map
+var map = L.map('map').setView([20.0, -90.0], 5);
+
+// Use OpenStreetMap standard tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Locations with emojis and numbers
+var locations = [
+    {name: "Mexico City", coords: [19.4326, -99.1332], desc: "Start of the trip 🌆: Zócalo, Cathedral, Chapultepec"},
+    {name: "Teotihuacan", coords: [19.6925, -98.8439], desc: "Pyramids of the Sun and Moon 🗿"},
+    {name: "Villahermosa", coords: [17.9895, -92.9475], desc: "La Venta Park - Olmec heads 🗿🌳"},
+    {name: "Palenque", coords: [17.4849, -92.0468], desc: "Mayan ruins in the jungle 🏯🌴"},
+    {name: "Bonampak", coords: [16.7033, -91.0596], desc: "Mayan murals 🎨"},
+    {name: "Yaxchilan", coords: [16.9013, -90.9741], desc: "River journey and ruins 🚤🌊"},
+    {name: "Calakmul", coords: [18.1046, -89.811], desc: "Hidden Mayan city 🌴🗿"},
+    {name: "Merida", coords: [20.9674, -89.5926], desc: "Cultural capital 🎭"},
+    {name: "Uxmal", coords: [20.3600, -89.7711], desc: "Puuc architecture 🏛️"},
+    {name: "Kabah", coords: [20.3720, -89.6797], desc: "Palace of Masks 🎭🗿"},
+    {name: "Labná", coords: [20.1104, -89.4174], desc: "Iconic Mayan arch 🏰"},
+    {name: "Chichen Itza", coords: [20.6843, -88.5678], desc: "El Castillo pyramid 🐍"},
+    {name: "Cancun", coords: [21.1619, -86.8515], desc: "Beach and relaxation 🏖️🍹"}
+];
+
+// Create numbered marker icons
+function createNumberIcon(number) {
+    return L.divIcon({
+        html: `<div style="
+            background:#E67E22;
+            color:white;
+            width:30px; 
+            height:30px; 
+            line-height:30px; 
+            text-align:center; 
+            border-radius:50%;
+            font-weight:bold;
+            box-shadow:0 0 3px rgba(0,0,0,0.5);
+            ">${number}</div>`,
+        className: '',
+        iconSize: [30, 30]
+    });
+}
+
+// Add markers with numbers and emoji popups
+locations.forEach(function(loc, index){
+    L.marker(loc.coords, {icon: createNumberIcon(index+1)})
+        .addTo(map)
+        .bindPopup(`<b>${index+1}. ${loc.name}</b><br>${loc.desc}`);
+});
+
+// Draw route polyline
+var routeCoords = locations.map(l => l.coords);
+L.polyline(routeCoords, {
+    color: '#E67E22',
+    weight: 4,
+    opacity: 0.8,
+    smoothFactor: 1,
+    lineJoin: 'round'
+}).addTo(map);
+
+</script>
+
+</body>
+</html>
