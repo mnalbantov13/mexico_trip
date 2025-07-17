@@ -14,21 +14,58 @@
 
 <div id="map"></div>
 
+<!-- Day-by-day program viewer -->
+<div id="program-viewer" style="
+    position: absolute;
+    top: 20px;
+    left: 80px; /* moved right so it's not over the zoom buttons */
+    background: rgba(45,64,89,0.97);
+    color: #FFD460;
+    padding: 18px 24px 12px 24px;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    max-width: 350px;
+    z-index: 1000;
+    font-size: 16px;
+    display: none;
+">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span id="day-title" style="font-weight:bold;"></span>
+        <button id="close-program" style="background:none;border:none;color:#FFD460;font-size:22px;cursor:pointer;padding:0 0 0 12px;">✖</button>
+    </div>
+    <div id="day-content" style="margin-top:12px;"></div>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 18px;">
+        <button id="prev-day" style="background:none;border:none;color:#FFD460;font-size:22px;cursor:pointer;padding:0;">&#8592;</button>
+        <span id="day-indicator" style="color:#FFD460;font-size:16px;font-weight:bold;"></span>
+        <button id="next-day" style="background:none;border:none;color:#FFD460;font-size:22px;cursor:pointer;padding:0;">&#8594;</button>
+    </div>
+</div>
+<button id="open-program" style="
+    position: absolute;
+    top: 20px;
+    left: 80px; /* moved right so it's not over the zoom buttons */
+    z-index: 1100;
+    background: rgba(45,64,89,0.97);
+    color: #FFD460;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+">Show Program</button>
+
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 // Initialize the map
 var map = L.map('map').setView([20.0, -90.0], 5);
 
 // Use OpenStreetMap standard tiles
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer('	https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// International flights info
-var flightsInfo = `
-<b>International Flights:</b><br>
-Sofia, Bulgaria → Istanbul, Turkey → Mexico City, Mexico
-`;
+
 
 // Create emoji marker icons
 function createEmojiIcon(emoji) {
@@ -172,14 +209,188 @@ L.polyline(routeCoords, {
     lineJoin: 'round'
 }).addTo(map);
 
-// Show flights info on map load
-map.once('load', function() {
-    L.popup({maxWidth: 300})
-        .setLatLng([19.4326, -99.1332])
-        .setContent(flightsInfo)
-        .openOn(map);
-});
 map.fire('load');
+</script>
+
+<script>
+// Daily program data
+const programDays = [
+    {
+        title: "Day 1: Dec 25, 2025 - Departure from Sofia",
+        content: `
+        ✈️ <b>21:40</b> - Departure from Sofia (TK 1030 flight to Istanbul)<br>
+        🌍 Travel day to Mexico
+        `
+    },
+    {
+        title: "Day 2: Dec 26, 2025 - Arrival in Mexico City",
+        content: `
+        ✈️ <b>00:15</b> - Arrival in Istanbul<br>
+        ✈️ <b>01:55</b> - Connection flight TK 184 to Mexico City (14h 45min flight)<br>
+        🕖 <b>07:50</b> - Arrival in Mexico City<br>
+        <b>Morning/Afternoon:</b><br>
+        🏛️ Mexico Cathedral (largest & oldest in Latin America)<br>
+        🏙️ Zocalo (main square) & historical buildings<br>
+        🏺 Templo Mayor (Main Temple of the Mexica people)<br>
+        🏨 Accommodation: The Green Park Hotel ***** (near Chapultepec Park)
+        `
+    },
+    {
+        title: "Day 3: Dec 27, 2025 - Teotihuacan & Anthropology Museum",
+        content: `
+        <b>Morning:</b><br>
+        🗿 Teotihuacan (UNESCO World Heritage Site)<br>
+        🌑 Pyramid of the Moon (43m)<br>
+        ☀️ Pyramid of the Sun (75m, 3rd largest in world)<br>
+        🛤️ Avenue of the Dead (2.4km)<br>
+        🐍 Citadel & Temple of Quetzalcoatl<br>
+        <b>Afternoon:</b><br>
+        🏛️ National Museum of Anthropology<br>
+        🗿 Famous Sun Stone (Aztec calendar)<br>
+        🏛️ 23 exhibition halls<br>
+        🏨 Accommodation: The Green Park Hotel *****
+        `
+    },
+    {
+        title: "Day 4: Dec 28, 2025 - Mexico City Museums",
+        content: `
+        <b>Morning:</b><br>
+        ✈️ Mexican Air Force Museum<br>
+        🛩️ 12 thematic halls, aircraft, mythology<br>
+        <b>Afternoon:</b><br>
+        🎨 Frida Kahlo Museum (Blue House)<br>
+        🏠 Leon Trotsky Museum<br>
+        🏨 Accommodation: The Green Park Hotel *****
+        `
+    },
+    {
+        title: "Day 5: Dec 29, 2025 - Travel to Palenque",
+        content: `
+        ✈️ <b>07:50</b> - Flight AM 802 to Villahermosa<br>
+        🕘 <b>09:27</b> - Arrival in Villahermosa<br>
+        <b>Morning:</b><br>
+        🌴 De la Venta National Park (Olmec heads, wildlife)<br>
+        <b>Afternoon:</b><br>
+        💧 Agua Azul Waterfalls (natural pools)<br>
+        🏨 Transfer to Chan-Kah Palenque Hotel ***/*
+        `
+    },
+    {
+        title: "Day 6: Dec 30, 2025 - Bonampak & Yaxchilan",
+        content: `
+        🌳 Full Day Adventure: Jungle ruins<br>
+        🛶 Yaxchilan (boat ride on Usumacinta River)<br>
+        🏛️ Bonampak (best-preserved Mayan murals)<br>
+        🏨 Accommodation: Chan-Kah Palenque Hotel ***/*
+        `
+    },
+    {
+        title: "Day 7: Dec 31, 2025 - Palenque & New Year's Eve",
+        content: `
+        <b>Morning:</b><br>
+        🏯 Palenque (UNESCO World Heritage Site)<br>
+        <b>Afternoon:</b><br>
+        🦜 Aluxes Eco-park (wildlife conservation)<br>
+        <b>Evening:</b><br>
+        🎉 New Year's Eve celebration at hotel<br>
+        🏨 Accommodation: Chan-Kah Palenque Hotel ***/*
+        `
+    },
+    {
+        title: "Day 8: Jan 1, 2026 - Travel to Calakmul",
+        content: `
+        🍳 Breakfast & departure<br>
+        🚗 6-hour drive (364 km) to Calakmul<br>
+        🏨 Check-in at Puerta Calakmul Eco-Lodge ***/*<br>
+        🌳 Jungle villas, rest & relaxation
+        `
+    },
+    {
+        title: "Day 9: Jan 2, 2026 - Calakmul Archaeological Site",
+        content: `
+        🏯 Explore Calakmul ruins<br>
+        🐍 Former "Snake Kingdom" (largest Mayan city)<br>
+        🏛️ Great Pyramid (45m high)<br>
+        🏨 Accommodation: Puerta Calakmul Eco-Lodge ***/*
+        `
+    },
+    {
+        title: "Day 10: Jan 3, 2026 - Travel to Merida",
+        content: `
+        🚗 Early departure to Merida (6.5h, 420 km)<br>
+        🏨 Check-in at Hyatt Regency Merida *****<br>
+        🚶‍♂️ Walking tour of historic center<br>
+        🐴 Horse-drawn carriage rides<br>
+        🍫 Chocolate tasting at Cacao Museum
+        `
+    },
+    {
+        title: "Day 11: Jan 4, 2026 - Uxmal & Surrounding Sites",
+        content: `
+        🏯 Labna (UNESCO) - Palace, Mayan arch<br>
+        🏛️ Kabah (UNESCO) - Palace of Masks<br>
+        🏯 Uxmal (UNESCO) - Pyramid of the Magician, Nunnery Quadrangle, Governor's Palace<br>
+        🏨 Accommodation: Hyatt Regency Merida *****
+        `
+    },
+    {
+        title: "Day 12: Jan 5, 2026 - Chichen Itza & Transfer to Cancun",
+        content: `
+        🏯 Chichen Itza (UNESCO World Heritage Site)<br>
+        🐍 El Castillo pyramid, Kukulkan serpent effect<br>
+        ⚽ Great Ball Court<br>
+        💧 Sacred Cenote (swimming)<br>
+        🚗 Travel to Cancun (200 km, 2.3h)<br>
+        🏨 Check-in at Wyndham Grand Cancun ***** (All-Inclusive)
+        `
+    },
+    {
+        title: "Day 13: Jan 6, 2026 - Departure from Cancun",
+        content: `
+        🍳 Breakfast at hotel<br>
+        ✈️ <b>14:40</b> - Flight TK 182 to Istanbul (12h 5min flight)<br>
+        🌍 Travel day back to Europe
+        `
+    },
+    {
+        title: "Day 14: Jan 7, 2026 - Return to Sofia",
+        content: `
+        ✈️ <b>10:40</b> - Arrival in Istanbul<br>
+        ✈️ <b>14:45</b> - Connection flight TK 1031 to Sofia<br>
+        🕒 <b>15:05</b> - Arrival in Sofia
+        `
+    }
+];
+
+let currentDay = 0;
+function updateProgramViewer() {
+    document.getElementById('day-title').innerText = programDays[currentDay].title;
+    document.getElementById('day-content').innerHTML = programDays[currentDay].content;
+    document.getElementById('day-indicator').innerText = `${currentDay + 1} / ${programDays.length}`;
+    document.getElementById('prev-day').disabled = currentDay === 0;
+    document.getElementById('next-day').disabled = currentDay === programDays.length - 1;
+    document.getElementById('prev-day').style.opacity = currentDay === 0 ? "0.5" : "1";
+    document.getElementById('next-day').style.opacity = currentDay === programDays.length - 1 ? "0.5" : "1";
+}
+document.getElementById('prev-day').onclick = function() {
+    if (currentDay > 0) { currentDay--; updateProgramViewer(); }
+};
+document.getElementById('next-day').onclick = function() {
+    if (currentDay < programDays.length - 1) { currentDay++; updateProgramViewer(); }
+};
+document.getElementById('close-program').onclick = function() {
+    document.getElementById('program-viewer').style.display = 'none';
+    document.getElementById('open-program').style.display = 'block';
+};
+document.getElementById('open-program').onclick = function() {
+    document.getElementById('program-viewer').style.display = 'block';
+    document.getElementById('open-program').style.display = 'none';
+    updateProgramViewer();
+};
+// Show program by default on first load
+document.getElementById('program-viewer').style.display = 'block';
+document.getElementById('open-program').style.display = 'none';
+updateProgramViewer();
 </script>
 
 </body>
