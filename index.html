@@ -17,17 +17,18 @@
 <!-- Day-by-day program viewer -->
 <div id="program-viewer" style="
     position: absolute;
-    top: 20px;
-    left: 80px; /* moved right so it's not over the zoom buttons */
+    top: 60px;
+    left: 5vw;
+    width: 90vw;
+    max-width: 400px;
     background: rgba(45,64,89,0.97);
     color: #FFD460;
-    padding: 18px 24px 12px 24px;
+    padding: 18px 12px 12px 12px;
     border-radius: 14px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-    max-width: 350px;
-    z-index: 1000;
+    z-index: 9999;
     font-size: 16px;
-    display: none;
+    overflow-y: auto;
 ">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <span id="day-title" style="font-weight:bold;"></span>
@@ -43,7 +44,7 @@
 <button id="open-program" style="
     position: absolute;
     top: 20px;
-    left: 80px; /* moved right so it's not over the zoom buttons */
+    left: 5vw;
     z-index: 1100;
     background: rgba(45,64,89,0.97);
     color: #FFD460;
