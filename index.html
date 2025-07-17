@@ -8,6 +8,56 @@
     <style>
         body, html { margin:0; padding:0; height:100%; font-family:Arial, sans-serif; }
         #map { height:100%; }
+        /* Responsive centering for program viewer and button */
+        #program-viewer, #open-program {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #program-viewer {
+            position: absolute;
+            top: 60px;
+            width: 90vw;
+            max-width: 400px;
+            background: rgba(45,64,89,0.97);
+            color: #FFD460;
+            padding: 18px 12px 12px 12px;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            z-index: 9999;
+            font-size: 16px;
+            overflow-y: auto;
+            display: none;
+            text-align: center;
+        }
+        #open-program {
+            position: absolute;
+            top: 20px;
+            width: auto;
+            background: rgba(45,64,89,0.97);
+            color: #FFD460;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            z-index: 1100;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            #program-viewer {
+                top: 60px;
+                width: 98vw;
+                max-width: 98vw;
+                padding: 12px 4vw 12px 4vw;
+            }
+            #open-program {
+                top: 20px;
+                width: 80vw;
+                max-width: 98vw;
+                padding: 8px 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -15,21 +65,7 @@
 <div id="map"></div>
 
 <!-- Day-by-day program viewer -->
-<div id="program-viewer" style="
-    position: absolute;
-    top: 60px;
-    left: 5vw;
-    width: 90vw;
-    max-width: 400px;
-    background: rgba(45,64,89,0.97);
-    color: #FFD460;
-    padding: 18px 12px 12px 12px;
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-    z-index: 9999;
-    font-size: 16px;
-    overflow-y: auto;
-">
+<div id="program-viewer">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <span id="day-title" style="font-weight:bold;"></span>
         <button id="close-program" style="background:none;border:none;color:#FFD460;font-size:22px;cursor:pointer;padding:0 0 0 12px;">✖</button>
@@ -41,20 +77,7 @@
         <button id="next-day" style="background:none;border:none;color:#FFD460;font-size:22px;cursor:pointer;padding:0;">&#8594;</button>
     </div>
 </div>
-<button id="open-program" style="
-    position: absolute;
-    top: 20px;
-    left: 5vw;
-    z-index: 1100;
-    background: rgba(45,64,89,0.97);
-    color: #FFD460;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-">Show Program</button>
+<button id="open-program">Show Program</button>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
@@ -200,10 +223,10 @@ locations.forEach(function(loc){
         </div>`);
 });
 
-// Draw route polyline
-var routeCoords = locations.map(l => l.coords);
+// Draw route polyline connecting daily points in order
+var routeCoords = dailyMapPoints.map(p => p.coords);
 L.polyline(routeCoords, {
-    color: '#FFA500', // darker orange-brown
+    color: '#B86B00', // dark orange-brown
     weight: 6,
     opacity: 1,
     dashArray: '10,6',
@@ -388,10 +411,110 @@ document.getElementById('open-program').onclick = function() {
     document.getElementById('open-program').style.display = 'none';
     updateProgramViewer();
 };
-// Show program by default on first load
-document.getElementById('program-viewer').style.display = 'block';
-document.getElementById('open-program').style.display = 'none';
-updateProgramViewer();
+// Hide program by default on first load
+document.getElementById('program-viewer').style.display = 'none';
+document.getElementById('open-program').style.display = 'block';
+// Only show the program when the button is pressed
+// updateProgramViewer(); // Remove or comment out this line
+</script>
+
+<script>
+// Brief daily points for the map (one per day, short description)
+// Start with day 2 at Mexico City, skip Sofia (day 1 and day 14)
+const dailyMapPoints = [
+    {
+        coords: [19.4326, -99.1332], // Mexico City
+        emoji: "🏙️",
+        desc: "Arrive in Mexico City",
+        day: 2
+    },
+    {
+        coords: [19.6925, -98.8439], // Teotihuacan
+        emoji: "🗿",
+        desc: "Visit Teotihuacan & Museum",
+        day: 3
+    },
+    {
+        coords: [19.3556, -99.1622], // Mexico City Museums (approx Chapultepec)
+        emoji: "🎨",
+        desc: "Museums in Mexico City",
+        day: 4
+    },
+    {
+        coords: [17.9895, -92.9475], // Villahermosa
+        emoji: "🌴",
+        desc: "Fly to Villahermosa, visit park",
+        day: 5
+    },
+    {
+        coords: [16.7033, -91.0596], // Bonampak & Yaxchilan
+        emoji: "🌳",
+        desc: "Jungle ruins adventure",
+        day: 6
+    },
+    {
+        coords: [17.4849, -92.0468], // Palenque
+        emoji: "🏞️",
+        desc: "Explore Palenque & celebrate NYE",
+        day: 7
+    },
+    {
+        coords: [18.1046, -89.811], // Calakmul
+        emoji: "🌲",
+        desc: "Travel to Calakmul, relax",
+        day: 8
+    },
+    {
+        coords: [18.1046, -89.811], // Calakmul
+        emoji: "🏯",
+        desc: "Explore Calakmul ruins",
+        day: 9
+    },
+    {
+        coords: [20.9674, -89.5926], // Merida
+        emoji: "🏡",
+        desc: "Drive to Merida, city tour",
+        day: 10
+    },
+    {
+        coords: [20.3600, -89.7711], // Uxmal/Kabah/Labna
+        emoji: "🏺",
+        desc: "Visit Uxmal & Puuc sites",
+        day: 11
+    },
+    {
+        coords: [20.6843, -88.5678], // Chichen Itza
+        emoji: "⛩️",
+        desc: "Chichen Itza & travel to Cancun",
+        day: 12
+    },
+    {
+        coords: [21.1619, -86.8515], // Cancun
+        emoji: "🏖️",
+        desc: "Departure from Cancun",
+        day: 13
+    }
+];
+
+// Add daily points to the map, include day number in popup
+dailyMapPoints.forEach(function(point){
+    L.marker(point.coords, {icon: createEmojiIcon(point.emoji)})
+        .addTo(map)
+        .bindPopup(`<div style="font-size:15px;">
+            <b>Day ${point.day}:</b> ${point.emoji} ${point.desc}
+        </div>`);
+});
+
+// Draw route polyline connecting daily pins in order
+var routeCoords = dailyMapPoints.map(p => p.coords);
+L.polyline(routeCoords, {
+    color: '#FFA500', // brighter orange
+    weight: 5,
+    opacity: 1,
+    dashArray: '10,6',
+    lineJoin: 'round'
+}).addTo(map);
+
 </script>
 
 </body>
