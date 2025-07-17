@@ -8,33 +8,11 @@
     <style>
         body, html { margin:0; padding:0; height:100%; font-family:Arial, sans-serif; }
         #map { height:100%; }
-        .info-panel {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.9);
-            color: #333;
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-            max-width: 300px;
-            font-size: 16px;
-            line-height: 1.5;
-        }
-        .info-panel h2 {
-            margin:0 0 10px 0;
-            font-size: 22px;
-            color: #E67E22;
-        }
     </style>
 </head>
 <body>
 
 <div id="map"></div>
-<div class="info-panel">
-    <h2>Mexico Adventure</h2>
-    <p>Follow the numbered route with fun emojis to see each destination's theme.</p>
-</div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
@@ -46,59 +24,162 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// Locations with emojis and numbers
-var locations = [
-    {name: "Mexico City", coords: [19.4326, -99.1332], desc: "Start of the trip 🌆: Zócalo, Cathedral, Chapultepec"},
-    {name: "Teotihuacan", coords: [19.6925, -98.8439], desc: "Pyramids of the Sun and Moon 🗿"},
-    {name: "Villahermosa", coords: [17.9895, -92.9475], desc: "La Venta Park - Olmec heads 🗿🌳"},
-    {name: "Palenque", coords: [17.4849, -92.0468], desc: "Mayan ruins in the jungle 🏯🌴"},
-    {name: "Bonampak", coords: [16.7033, -91.0596], desc: "Mayan murals 🎨"},
-    {name: "Yaxchilan", coords: [16.9013, -90.9741], desc: "River journey and ruins 🚤🌊"},
-    {name: "Calakmul", coords: [18.1046, -89.811], desc: "Hidden Mayan city 🌴🗿"},
-    {name: "Merida", coords: [20.9674, -89.5926], desc: "Cultural capital 🎭"},
-    {name: "Uxmal", coords: [20.3600, -89.7711], desc: "Puuc architecture 🏛️"},
-    {name: "Kabah", coords: [20.3720, -89.6797], desc: "Palace of Masks 🎭🗿"},
-    {name: "Labná", coords: [20.1104, -89.4174], desc: "Iconic Mayan arch 🏰"},
-    {name: "Chichen Itza", coords: [20.6843, -88.5678], desc: "El Castillo pyramid 🐍"},
-    {name: "Cancun", coords: [21.1619, -86.8515], desc: "Beach and relaxation 🏖️🍹"}
-];
+// International flights info
+var flightsInfo = `
+<b>International Flights:</b><br>
+Sofia, Bulgaria → Istanbul, Turkey → Mexico City, Mexico
+`;
 
-// Create numbered marker icons
-function createNumberIcon(number) {
+// Create emoji marker icons
+function createEmojiIcon(emoji) {
     return L.divIcon({
         html: `<div style="
-            background:#E67E22;
-            color:white;
-            width:30px; 
-            height:30px; 
-            line-height:30px; 
-            text-align:center; 
+            background:#2D4059;
+            color:#FFD460;
+            font-size:22px;
+            width:36px;
+            height:36px;
+            line-height:36px;
+            text-align:center;
             border-radius:50%;
-            font-weight:bold;
-            box-shadow:0 0 3px rgba(0,0,0,0.5);
-            ">${number}</div>`,
+            box-shadow:0 2px 8px rgba(0,0,0,0.18);
+            ">${emoji}</div>`,
         className: '',
-        iconSize: [30, 30]
+        iconSize: [36, 36]
     });
 }
 
-// Add markers with numbers and emoji popups
-locations.forEach(function(loc, index){
-    L.marker(loc.coords, {icon: createNumberIcon(index+1)})
+// Locations with emojis and stylish popups
+var locations = [
+    {
+        name: "Mexico City",
+        coords: [19.4326, -99.1332],
+        emoji: "🏙️",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏛️ Zócalo & Catedral Metropolitana<br>
+        🏺 Templo Mayor<br>
+        🌳 Chapultepec Park & Anthropological Museum<br>
+        🎨 Frida Kahlo Museum (Coyoacán)<br>
+        🏠 Leon Trotsky Museum
+        `
+    },
+    {
+        name: "Teotihuacan",
+        coords: [19.6925, -98.8439],
+        emoji: "🗿",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏜️ Pyramids of the Sun and Moon<br>
+        <b>Nearby:</b> Mexico City
+        `
+    },
+    {
+        name: "Villahermosa",
+        coords: [17.9895, -92.9475],
+        emoji: "🌴",
+        desc: `
+        <b>Main Sites:</b><br>
+        🗿 Parque La Venta (Olmec heads)
+        `
+    },
+    {
+        name: "Palenque",
+        coords: [17.4849, -92.0468],
+        emoji: "🏞️",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏯 Palenque Ruins (UNESCO site)<br>
+        🦜 Aluxes Ecopark<br>
+        💧 <b>Nearby:</b> Agua Azul waterfalls
+        `
+    },
+    {
+        name: "Bonampak & Yaxchilan",
+        coords: [16.7033, -91.0596],
+        emoji: "🎨",
+        desc: `
+        <b>Main Sites:</b><br>
+        🖼️ Bonampak murals<br>
+        🏛️ Yaxchilan ruins<br>
+        <b>Region:</b> Chiapas, near Guatemala border
+        `
+    },
+    {
+        name: "Calakmul",
+        coords: [18.1046, -89.811],
+        emoji: "🌳",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏯 Large Maya site in Campeche jungle
+        `
+    },
+    {
+        name: "Mérida",
+        coords: [20.9674, -89.5926],
+        emoji: "🏡",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏛️ Historical center<br>
+        🍫 Museum of Cocoa (chocolate tasting)
+        `
+    },
+    {
+        name: "Uxmal, Kabah, Labna",
+        coords: [20.3600, -89.7711],
+        emoji: "🏺",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏯 Maya Puuc sites (UNESCO): Uxmal, Kabah, Labna
+        `
+    },
+    {
+        name: "Chichén Itzá",
+        coords: [20.6843, -88.5678],
+        emoji: "⛩️",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏯 Chichén Itzá (UNESCO World Heritage Site)
+        `
+    },
+    {
+        name: "Cancún",
+        coords: [21.1619, -86.8515],
+        emoji: "🏖️",
+        desc: `
+        <b>Main Sites:</b><br>
+        🏝️ Beaches and relaxation
+        `
+    }
+];
+
+// Add markers with emojis and stylish popups
+locations.forEach(function(loc){
+    L.marker(loc.coords, {icon: createEmojiIcon(loc.emoji)})
         .addTo(map)
-        .bindPopup(`<b>${index+1}. ${loc.name}</b><br>${loc.desc}`);
+        .bindPopup(`<div style="font-size:16px;line-height:1.5;">
+            <b>${loc.emoji} ${loc.name}</b><br>${loc.desc}
+        </div>`);
 });
 
 // Draw route polyline
 var routeCoords = locations.map(l => l.coords);
 L.polyline(routeCoords, {
-    color: '#E67E22',
-    weight: 4,
-    opacity: 0.8,
-    smoothFactor: 1,
+    color: '#FFA500', // darker orange-brown
+    weight: 6,
+    opacity: 1,
+    dashArray: '10,6',
     lineJoin: 'round'
 }).addTo(map);
 
+// Show flights info on map load
+map.once('load', function() {
+    L.popup({maxWidth: 300})
+        .setLatLng([19.4326, -99.1332])
+        .setContent(flightsInfo)
+        .openOn(map);
+});
+map.fire('load');
 </script>
 
 </body>
