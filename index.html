@@ -7,7 +7,15 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         body, html { margin:0; padding:0; height:100%; font-family:Arial, sans-serif; }
-        #map { height:100%; }
+        #map {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            min-height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+        }
         #program-viewer, #open-program {
             left: 50%;
             transform: translateX(-50%);
@@ -15,11 +23,11 @@
         #program-viewer {
             position: absolute;
             top: 60px;
-            width: 94vw;
+            width: 90vw;
             max-width: 370px;
             background: rgba(45,64,89,0.97);
             color: #FFD460;
-            padding: 18px 8px 12px 8px;
+            padding: 18px 16px 12px 16px;
             border-radius: 14px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.18);
             z-index: 9999;
@@ -46,17 +54,24 @@
             text-align: center;
         }
         @media (max-width: 600px) {
+            #map {
+                width: 100vw;
+                height: 100vh;
+                min-height: 100vh;
+                max-height: 100vh;
+                overflow: hidden;
+            }
             #program-viewer {
-                top: 60px;
+                top: 56px;
                 left: 50%;
                 transform: translateX(-50%);
                 width: 92vw;
                 max-width: 340px;
                 min-width: 220px;
-                padding: 12px 2vw 12px 2vw;
+                padding: 12px 5vw 12px 5vw;
             }
             #open-program {
-                top: 16px;
+                top: 12px;
                 left: 50%;
                 transform: translateX(-50%);
                 width: 80vw;
