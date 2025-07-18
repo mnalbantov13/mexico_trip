@@ -52,6 +52,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.12);
             z-index: 1100;
             text-align: center;
+            white-space: nowrap;
         }
         @media (max-width: 600px) {
             #map {
@@ -74,10 +75,10 @@
                 top: 12px;
                 left: 50%;
                 transform: translateX(-50%);
-                width: 80vw;
-                max-width: 320px;
-                min-width: 180px;
-                padding: 8px 0;
+                width: auto; /* Make button only as wide as its text */
+                max-width: 98vw;
+                min-width: unset;
+                padding: 8px 18px;
             }
         }
     </style>
@@ -387,7 +388,7 @@ const programDays = [
         ⚽ Great Ball Court<br>
         💧 Sacred Cenote (swimming)<br>
         🚗 Travel to Cancun (200 km, 2.3h)<br>
-        🏨 Check-in at Wyndham Grand Cancun ***** (All-Inclusive)
+        🏨 Check-in at Wyndham Grand Cancun   (All-Inclusive)
         `
     },
     {
@@ -431,7 +432,29 @@ document.getElementById('close-program').onclick = function() {
 document.getElementById('open-program').onclick = function() {
     document.getElementById('program-viewer').style.display = 'block';
     document.getElementById('open-program').style.display = 'none';
+    // If a popup is open (lastClickedDay !== null), open that day
+    // Otherwise, open the last viewed day before closing
+    if (lastClickedDay !== null) {
+        currentDay = lastClickedDay;
+    } else {
+        currentDay = lastViewedDay;
+    }
     updateProgramViewer();
+};
+
+// Update lastViewedDay when navigating the program
+document.getElementById('prev-day').onclick = function() {
+    if (currentDay > 0) { currentDay--; updateProgramViewer(); }
+    lastViewedDay = currentDay;
+};
+document.getElementById('next-day').onclick = function() {
+    if (currentDay < programDays.length - 1) { currentDay++; updateProgramViewer(); }
+    lastViewedDay = currentDay;
+};
+document.getElementById('close-program').onclick = function() {
+    document.getElementById('program-viewer').style.display = 'none';
+    document.getElementById('open-program').style.display = 'block';
+    lastViewedDay = currentDay;
 };
 // Hide program by default on first load
 document.getElementById('program-viewer').style.display = 'none';
@@ -518,13 +541,23 @@ const dailyMapPoints = [
     }
 ];
 
+// Track the last clicked day on the map
+let lastClickedDay = null;
+let lastViewedDay = 0;
+
 // Add daily points to the map, include day number in popup
-dailyMapPoints.forEach(function(point){
-    L.marker(point.coords, {icon: createEmojiIcon(point.emoji)})
+dailyMapPoints.forEach(function(point, idx){
+    const marker = L.marker(point.coords, {icon: createEmojiIcon(point.emoji)})
         .addTo(map)
         .bindPopup(`<div style="font-size:15px;">
             <b>Day ${point.day}:</b> ${point.emoji} ${point.desc}
         </div>`);
+    marker.on('popupopen', function() {
+        lastClickedDay = point.day - 1;
+    });
+    marker.on('popupclose', function() {
+        lastClickedDay = null;
+    });
 });
 
 // Draw route polyline connecting daily pins in order
